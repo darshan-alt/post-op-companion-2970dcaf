@@ -6,6 +6,12 @@ import { MedicalDisclaimer } from "@/components/MedicalDisclaimer";
 
 type Status = "emergency" | "urgent" | "normal";
 
+interface LocationState {
+  status: Status;
+  condition?: string;
+  conditionDescription?: string;
+}
+
 const statusConfig = {
   emergency: {
     title: "EMERGENCY",
@@ -51,7 +57,10 @@ const watchlistItems = [
 export default function ResultsPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const status: Status = location.state?.status || "normal";
+  const state = location.state as LocationState | null;
+  const status: Status = state?.status || "normal";
+  const condition = state?.condition;
+  const conditionDescription = state?.conditionDescription;
   const config = statusConfig[status];
   const StatusIcon = config.icon;
 
@@ -69,8 +78,13 @@ export default function ResultsPage() {
             <h1 className={`text-3xl font-bold ${config.titleClass} mb-3`}>
               {config.title}
             </h1>
+            {condition && (
+              <p className={`text-xl font-semibold ${config.titleClass} mb-2`}>
+                {condition}
+              </p>
+            )}
             <p className="text-xl text-foreground leading-relaxed">
-              {config.message}
+              {conditionDescription || config.message}
             </p>
 
             {config.actionLabel && config.actionHref && (
